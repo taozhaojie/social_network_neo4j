@@ -1,0 +1,47 @@
+body {
+    width: 100%;
+    height: 100%;
+}
+
+.view {
+    width: 400px;
+    height: 600px;
+    position: absolute;
+    left: 20px;
+    top: 50px;
+    border: 1px solid #000000;
+}
+
+#view-heading {
+    font-size: 15pt;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+#send-heading {
+    font-size: 15pt;
+    position: absolute;
+    top: 20px;
+    left: 450px;
+}
+
+.send {
+    width: 400px;
+    height: 100px;
+    position: absolute;
+    left: 450px;
+    top: 50px;
+    border: 1px solid #000000;
+}
+
+.send input {
+    width: 380px;
+    margin-left: 10px;
+    margin-top: 10px;
+    padding: 5px;
+}
+
+.send button {
+    margin: 10px;
+}
