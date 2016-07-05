@@ -15,6 +15,7 @@ function getQueryParams() {
 var args = getQueryParams();
 var uid = args['me'];
 
+// load friendship requests
 $.ajax({
     method: "GET",
     url: "/user/friend?action=req&me="+uid,
@@ -25,6 +26,21 @@ $.ajax({
         var name = v['name'];
         var st = '<span>'+name+'</span><button onclick="accept_request('+id.toString()+')" style="margin-left:30px;">接受</button><br><br>'
         $('#friend-req').append(st);
+    });
+
+});
+
+// load friends
+$.ajax({
+    method: "GET",
+    url: "/user/friend?action=v&me="+uid,
+}).done(function(msg) {
+    var data = $.parseJSON(msg)['data'];
+    $.each(data, function(k, v) {
+        var id = v['uid'];
+        var name = v['name'];
+        var st = '<span>'+name+'</span><button onclick="friend_delete('+id.toString()+')" style="margin-left:30px;">删除</button><br><br>'
+        $('#friend-list').append(st);
     });
 
 });
@@ -55,6 +71,17 @@ function accept_request (init_user) {
     $.ajax({
         method: "POST",
         url: "/user/friend?action=ack",
+        data: {'init_user': init_user, 'recv_user': recv_user}
+    }).done(function(msg) {
+        location.reload();
+    });
+}
+
+function friend_delete (init_user) {
+    var recv_user = uid;
+    $.ajax({
+        method: "POST",
+        url: "/user/friend?action=del",
         data: {'init_user': init_user, 'recv_user': recv_user}
     }).done(function(msg) {
         location.reload();

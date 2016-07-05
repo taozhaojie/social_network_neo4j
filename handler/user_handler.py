@@ -47,3 +47,5 @@ class UserHandler(tornado.web.RequestHandler):
 						User.friend_request(init_user, recv_user, self)
 					elif action == 'ack':
 						User.friend_accept(init_user, recv_user, self)
+					elif action == 'del':
+						User.friend_delete(init_user, recv_user, self)

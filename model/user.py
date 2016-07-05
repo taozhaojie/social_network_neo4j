@@ -61,3 +61,31 @@ class User(object):
 				CREATE (usr1)-[:FRIEND {timestamp:%i}]->(usr2)'''%(init_user, recv_user, function.timestamp())
 		res = db.cypher.execute(cql)
 		print '#', res
+
+	@classmethod
+	def friend_list(self,uid,sf):
+		uid = str(uid)
+		cql = '''
+				MATCH (me)
+				WHERE me.uid=%s
+				OPTIONAL MATCH (me)-[r:FRIEND]-(friend)
+				RETURN friend'''%uid
+		res = db.cypher.execute(cql)
+
+		ret = []
+		for usr in res:
+			ret.append(usr[0].properties)
+
+		sf.write(json_encode({'ret':0, 'data':ret}))
+
+	@classmethod
+	def friend_delete(self,init_user,recv_user,sf):
+		init_user = str(init_user)
+		recv_user = str(recv_user)
+
+		cql = '''
+				MATCH (usr1:User {uid:%s})-[r:FRIEND]->(usr2:User {uid:%s}) 
+				DELETE r'''%(init_user,recv_user)
+		res = db.cypher.execute(cql)
+
+		sf.write(json_encode({'ret':0}))

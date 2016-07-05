@@ -18,6 +18,7 @@ body {
     top: 50px;
     border: 1px solid #000000;
     padding: 10px;
+    overflow-y: scroll;
 }
 
 #friend-add-heading {
