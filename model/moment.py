@@ -1,7 +1,7 @@
 import db
-import uuid
 import function
 from tornado import gen
+import uuid
 
 class Moment(object):
 	def __init__(self,vid,action):
@@ -13,7 +13,6 @@ class Moment(object):
 		sf.write('123')
 
 	@classmethod
-	@gen.coroutine
 	def create(self,text,uid,sf):
 		uid = str(uid)
 		cql = '''
@@ -25,6 +24,6 @@ class Moment(object):
 				WITH latest_update, collect(secondlatestupdate) AS seconds
 				FOREACH (x IN seconds | CREATE (latest_update)-[:NEXT]->(x))
 				RETURN latest_update.text AS new_status'''%(uid, uuid.uuid4(), text, function.timestamp())
-		res = yield db.cypher.execute(cql)
+		res = db.cypher.execute(cql)
 		print '#', res
 

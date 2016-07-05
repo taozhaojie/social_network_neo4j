@@ -52,6 +52,7 @@ body {
     top: 470px;
     border: 1px solid #000000;
     padding: 10px;
+    overflow-y: scroll;
 }
 
 #notif-heading {
@@ -69,4 +70,9 @@ body {
     top: 50px;
     border: 1px solid #000000;
     padding: 10px;
+}
+
+#friend-add-id {
+    width: 100%;
+    margin-bottom: 10px;
 }

@@ -15,6 +15,19 @@ function getQueryParams() {
 var args = getQueryParams();
 var uid = args['me'];
 
+$.ajax({
+    method: "GET",
+    url: "/user/friend?action=req&me="+uid,
+}).done(function(msg) {
+    var data = $.parseJSON(msg)['data'];
+    $.each(data, function(k, v) {
+        var id = v['uid'];
+        var name = v['name'];
+        var st = '<span>'+name+'</span><button onclick="accept_request('+id.toString()+')" style="margin-left:30px;">接受</button><br><br>'
+        $('#friend-req').append(st);
+    });
+
+});
 
 $(function(){
     $("#send-text").keyup(function(event){
@@ -24,14 +37,14 @@ $(function(){
     });
 });
 
-function submit () {
-    var text = $('#send-text').val();
-    $('#send-text').val('');
+function submit_request () {
+    var text = $('#friend-add-id').val();
+    $('#friend-add-id').val('');
 
     $.ajax({
         method: "POST",
-        url: "/moment/",
-        data: {'text': text, 'uid': uid}
+        url: "/user/friend?action=req",
+        data: {'init_user': uid, 'recv_user': text}
     }).done(function(msg) {
         location.reload();
     });

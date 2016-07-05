@@ -3,6 +3,7 @@ from model.moment import Moment
 from tornado.escape import json_encode
 
 class MomentHandler(tornado.web.RequestHandler):
+	# @tornado.web.asynchronous
 	def get(self, vid):
 		action = self.get_argument('action', 0)
 
@@ -19,6 +20,7 @@ class MomentHandler(tornado.web.RequestHandler):
 				if action == 'v':
 					Moment.list_one(self)
 
+	# @tornado.web.asynchronous
 	def post(self, vid):
 
 		text = self.get_argument('text', '')
