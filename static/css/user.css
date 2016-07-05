@@ -1,0 +1,72 @@
+body {
+    width: 100%;
+    height: 100%;
+}
+
+#friend-list-heading {
+    font-size: 15pt;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+#friend-list {
+    width: 400px;
+    height: 200px;
+    position: absolute;
+    left: 20px;
+    top: 50px;
+    border: 1px solid #000000;
+    padding: 10px;
+}
+
+#friend-add-heading {
+    font-size: 15pt;
+    position: absolute;
+    top: 280px;
+    left: 20px;
+}
+
+#friend-add {
+    width: 400px;
+    height: 100px;
+    position: absolute;
+    left: 20px;
+    top: 310px;
+    border: 1px solid #000000;
+    padding: 10px;
+}
+
+#friend-req-heading {
+    font-size: 15pt;
+    position: absolute;
+    top: 440px;
+    left: 20px;
+}
+
+#friend-req {
+    width: 400px;
+    height: 100px;
+    position: absolute;
+    left: 20px;
+    top: 470px;
+    border: 1px solid #000000;
+    padding: 10px;
+}
+
+#notif-heading {
+    font-size: 15pt;
+    position: absolute;
+    top: 20px;
+    left: 460px;
+}
+
+#notif {
+    width: 400px;
+    height: 100px;
+    position: absolute;
+    left: 460px;
+    top: 50px;
+    border: 1px solid #000000;
+    padding: 10px;
+}
