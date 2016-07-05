@@ -50,3 +50,13 @@ function submit_request () {
     });
 }
 
+function accept_request (init_user) {
+    var recv_user = uid;
+    $.ajax({
+        method: "POST",
+        url: "/user/friend?action=ack",
+        data: {'init_user': init_user, 'recv_user': recv_user}
+    }).done(function(msg) {
+        location.reload();
+    });
+}

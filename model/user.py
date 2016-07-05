@@ -48,3 +48,16 @@ class User(object):
 			ret.append(usr[0].properties)
 
 		sf.write(json_encode({'ret':0, 'data':ret}))
+
+	@classmethod
+	def friend_accept(self,init_user,recv_user,sf):
+		init_user = str(init_user)
+		recv_user = str(recv_user)
+
+		cql = '''
+				MATCH (usr1:User {uid:%s})-[r:FRIEND_REQ]->(usr2:User {uid:%s}) 
+				DELETE r 
+				WITH usr1,usr2 
+				CREATE (usr1)-[:FRIEND {timestamp:%i}]->(usr2)'''%(init_user, recv_user, function.timestamp())
+		res = db.cypher.execute(cql)
+		print '#', res
