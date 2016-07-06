@@ -15,12 +15,17 @@ class MomentHandler(tornado.web.RequestHandler):
 					uid = self.get_argument('me', 0)
 					page = self.get_argument('page', 0)
 					Moment.list(uid,page,self)
+
 		else:
 			if not action:
 				self.render('moment.html')
 			else:
 				if action == 'v':
 					Moment.list_one(self)
+				elif action == 'like':
+					uid = self.get_argument('me', 0)
+					Moment.like(vid,uid,self)
+
 
 	# @tornado.web.asynchronous
 	def post(self, vid):

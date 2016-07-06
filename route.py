@@ -5,5 +5,5 @@ from handler.moment_handler import MomentHandler
 route = [
     (r'/', IndexHandler),
     (r'/user/?(\w+)?', UserHandler),
-    (r'/moment/?(\w+)?', MomentHandler),
+    (r'/moment/?([\s\S]*?)?', MomentHandler),
 ]

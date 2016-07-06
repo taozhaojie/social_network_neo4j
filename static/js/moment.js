@@ -71,9 +71,18 @@ $.ajax({
         var st = `  <div class="moment-box">
                         <h1 onclick="view_user(`+uid+`)">`+name+`</h1><br>
                         <p>`+text+`</p><br>
-                        <span>`+time_pass+`</span><span onclick="like(`+id+`)">赞</span><span onclick="comment(`+id+`)">评论</span>
+                        <span>`+time_pass+`</span><span onclick="like('`+id+`')">赞</span><span onclick="comment(`+id+`)">评论</span>
                     </div>`
         $('#view').append(st);
     });
 
 });
+
+function like(moment_id) {
+    $.ajax({
+        method: "GET",
+        url: "/moment/"+moment_id+"?me="+uid+"&action=like"
+    }).done(function(msg) {
+        location.reload();
+    });
+}

@@ -53,3 +53,21 @@ class Moment(object):
 			pass
 
 		sf.write(json_encode({'ret':0, 'data':ret}))
+
+	@classmethod
+	def like(self,vid,uid,sf):
+		vid = str(vid)
+		uid = str(uid)
+		cql = '''
+				MATCH (me)
+				WHERE me.uid=%s
+				OPTIONAL MATCH (me)-[r:LIKE_FROM]-(secondlatestupdate)
+				DELETE r
+				CREATE (me)-[:LIKE_FROM]->(latest_update:LIKE {timestamp:%i})
+				WITH latest_update, collect(secondlatestupdate) AS seconds
+				FOREACH (x IN seconds | CREATE (latest_update)-[:NEXT]->(x))
+				WITH latest_update
+				MATCH (evt:Event {id: '%s'})
+				CREATE (latest_update)-[:LIKE_TO]->(evt)
+				RETURN latest_update.text AS new_status'''%(uid, function.timestamp(), vid)
+		res = db.cypher.execute(cql)
