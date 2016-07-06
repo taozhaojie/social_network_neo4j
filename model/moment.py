@@ -38,9 +38,10 @@ class Moment(object):
 				MATCH (me)
 				WHERE me.uid=%s
 				OPTIONAL MATCH (me)-[r:FRIEND]-(friends)
-				WITH friends
-				MATCH (friends)-[:POST]-(latestpost)-[:NEXT*%i..%i]-(posts)
-				RETURN friends.uid, friends.name, posts.text, posts.id, posts.timestamp as timestamp
+				WITH collect(friends)+collect(distinct(me)) as user
+				UNWIND user as users
+				MATCH (users)-[:POST]-(latestpost)-[:NEXT*%i..%i]-(posts)
+				RETURN users.uid, users.name, posts.text, posts.id, posts.timestamp as timestamp
 				ORDER BY timestamp DESC'''%(uid,page_start,page_end)
 		res = db.cypher.execute(cql)
 
