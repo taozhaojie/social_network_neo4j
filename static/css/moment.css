@@ -46,3 +46,32 @@ body {
 #send button {
     margin: 10px;
 }
+
+.moment-box {
+    width: 100%;
+    padding: 10px;
+    border-bottom: 1px solid #808080;
+    position: relative;
+}
+
+.moment-box h1 {
+    display: inline;
+    font-size: 15pt;
+    position: relative;
+    color: #003D7A;
+    cursor: pointer;
+}
+
+.moment-box p {
+    display: inline-block;
+    position: relative;
+    word-wrap: break-word;
+    width: 330px;
+}
+
+.moment-box span {
+    display: inline;
+    color: #6E6E6E;
+    margin-right: 30px;
+    cursor: pointer;
+}
