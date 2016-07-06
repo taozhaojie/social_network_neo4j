@@ -44,8 +44,11 @@ class User(object):
 		res = db.cypher.execute(cql)
 
 		ret = []
-		for usr in res:
-			ret.append(usr[0].properties)
+		try:
+			for usr in res:
+				ret.append(usr[0].properties)
+		except:
+			pass
 
 		sf.write(json_encode({'ret':0, 'data':ret}))
 
@@ -73,8 +76,11 @@ class User(object):
 		res = db.cypher.execute(cql)
 
 		ret = []
-		for usr in res:
-			ret.append(usr[0].properties)
+		try:
+			for usr in res:
+				ret.append(usr[0].properties)
+		except:
+			pass
 
 		sf.write(json_encode({'ret':0, 'data':ret}))
 
