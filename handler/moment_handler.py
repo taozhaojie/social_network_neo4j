@@ -12,7 +12,9 @@ class MomentHandler(tornado.web.RequestHandler):
 				self.render('moment.html')
 			else:
 				if action == 'v': #view
-					Moment.list(self)
+					uid = self.get_argument('me', 0)
+					page = self.get_argument('page', 0)
+					Moment.list(uid,page,self)
 		else:
 			if not action:
 				self.render('moment.html')
