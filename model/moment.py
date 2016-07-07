@@ -102,10 +102,39 @@ class Moment(object):
 				WITH latest_update
 				MATCH (evt:Event {id: '%s'})
 				CREATE (latest_update)-[:REPLY_TO]->(evt)
-				RETURN latest_update.text AS new_status'''%(uid, uuid.uuid4(), text, function.timestamp(), vid)
+				RETURN latest_update.id as uuid'''%(uid, uuid.uuid4(), text, function.timestamp(), vid)
 		print cql
 		res = db.cypher.execute(cql)
-		print '#', res
+
+		temp_id = res[0][0]
+		print temp_id
+
+		cql = '''
+				MATCH(me)
+				WHERE me.uid=%s
+				MATCH (evt:Event {id:'%s'})-[:REPLY_TO*]->(root_evt)
+				WITH root_evt, me
+				MATCH (me)-[r:SUBS_FROM]-(subs)-[:SUBS_TO]-(root_evt)
+				RETURN COUNT(r)
+				'''%(uid, temp_id)
+		print cql
+		res = db.cypher.execute(cql)
+
+		if res[0][0] == 0:
+			cql = '''
+					MATCH(me)
+					WHERE me.uid=%s
+					MATCH (evt:Event {id:'%s'})-[:REPLY_TO*]->(root_evt)
+					WITH root_evt, me
+					OPTIONAL MATCH (me)-[r:SUBS_FROM]-(secondlatestupdate)
+					DELETE r
+					CREATE (me)-[:SUBS_FROM]->(latest_update:SUBSCRIBLE {timestamp:%i})
+					WITH latest_update, root_evt, collect(secondlatestupdate) AS seconds
+					CREATE (latest_update)-[:SUBS_TO]->(root_evt)
+					WITH latest_update, seconds
+					FOREACH (x IN seconds | CREATE (latest_update)-[:NEXT]->(x))'''%(uid, temp_id, function.timestamp())
+			print cql
+			res = db.cypher.execute(cql)
 
 	@classmethod
 	def reply_get(self,vid,sf):
