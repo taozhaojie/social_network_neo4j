@@ -105,3 +105,29 @@ class Moment(object):
 				RETURN latest_update.text AS new_status'''%(uid, uuid.uuid4(), text, function.timestamp(), vid)
 		res = db.cypher.execute(cql)
 		print '#', res
+
+	@classmethod
+	def reply_get(self,vid,sf):
+		vid = str(vid)
+		cql = '''
+				MATCH (evt:Event {id:'%s'})-[r:REPLY_TO*0..]-(related_events)-[:NEXT*0..]-(other_replies)-[:REPLY|POST]-(replied_from)
+				WITH related_events, replied_from
+				MATCH (related_events)-[:REPLY_TO]->(replied_events)-[:NEXT*0..]-(other_replies)-[:REPLY|POST]-(replied_to)
+				RETURN  related_events.id, replied_events.id, related_events.text, replied_from.uid, replied_to.uid, replied_from.name, replied_to.name, replied_events.timestamp as time
+				ORDER BY time'''%(vid)
+		res = db.cypher.execute(cql)
+
+		ret = []
+		try:
+			for r in res:
+				ret.append({'reply_from': r[0],
+							'reply_to': r[1],
+							'text': r[2],
+							'user_from': r[3],
+							'user_to': r[4],
+							'user_from_name': r[5],
+							'user_to_name': r[6],
+							'time': r[7]})
+		except:
+			pass
+		sf.write(json_encode({'ret':0, 'data':ret}))

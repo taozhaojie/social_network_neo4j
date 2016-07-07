@@ -91,6 +91,7 @@ body {
     width: 100%;
     word-wrap: break-word;
     font-size: 12pt;
+    cursor: pointer;
 }
 
 .comment-box h2 {

@@ -27,6 +27,8 @@ class MomentHandler(tornado.web.RequestHandler):
 					Moment.like(vid,uid,self)
 				elif action == 'liked':
 					Moment.liked(vid,self)
+				elif action == 'reply':
+					Moment.reply_get(vid,self)
 
 
 	# @tornado.web.asynchronous

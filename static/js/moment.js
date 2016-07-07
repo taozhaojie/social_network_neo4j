@@ -84,14 +84,38 @@ $.ajax({
                 var st_liked = '';
             }
 
-            var st = `  <div class="moment-box">
-                            <h1 onclick="view_user(`+uid+`)">`+name+`</h1><br>
-                            <p>`+text+`</p><br>
-                            <span>`+time_pass+`</span><span onclick="like('`+id+`')">赞</span><span onclick="comment('`+id+`')">评论</span>
-                            `+st_liked+`
-                        </div>`
+            $.ajax({
+                method: "GET",
+                url: "/moment/"+id+"?action=reply"
+            }).done(function(msg) {
+                var data = $.parseJSON(msg)['data'];
+                var temp = [];
+                var st_reply = '';
+                $.each(data, function(k, v) {
+                    var reply_from = v['reply_from'];
+                    var reply_to = v['reply_to'];
+                    var user_from = v['user_from'];
+                    var user_to = v['user_to'];
+                    var user_from_name = v['user_from_name'];
+                    var user_to_name = v['user_to_name'];
+                    var text = v['text'];
 
-            $('#view').append(st);
+                    if (id.toString() == reply_to.toString()) {
+                        st_reply += `<div class="comment-box" onclick="comment('`+reply_from+`')"><h2>`+user_from_name+`</h2>: `+text+`</div>`;
+                    } else {
+                        st_reply += `<div class="comment-box" onclick="comment('`+reply_from+`')"><h2>`+user_from_name+`</h2>回复<h2>`+user_to_name+`</h2>: `+text+`</div>`;
+                    }
+                });
+
+                var st = `  <div class="moment-box">
+                                <h1 onclick="view_user(`+uid+`)">`+name+`</h1><br>
+                                <p>`+text+`</p><br>
+                                <span>`+time_pass+`</span><span onclick="like('`+id+`')">赞</span><span onclick="comment('`+id+`')">评论</span>
+                                `+st_liked+st_reply+`
+                            </div>`
+
+                $('#view').append(st);
+            }); 
         });
         
     });
