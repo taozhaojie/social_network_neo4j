@@ -15,7 +15,6 @@ function getQueryParams() {
 var args = getQueryParams();
 var uid = args['me'];
 
-
 $(function(){
     $("#send-text").keyup(function(event){
         if(event.which == 13){
@@ -88,7 +87,7 @@ $.ajax({
             var st = `  <div class="moment-box">
                             <h1 onclick="view_user(`+uid+`)">`+name+`</h1><br>
                             <p>`+text+`</p><br>
-                            <span>`+time_pass+`</span><span onclick="like('`+id+`')">赞</span><span onclick="comment(`+id+`)">评论</span>
+                            <span>`+time_pass+`</span><span onclick="like('`+id+`')">赞</span><span onclick="comment('`+id+`')">评论</span>
                             `+st_liked+`
                         </div>`
 
@@ -108,3 +107,14 @@ function like(moment_id) {
     });
 }
 
+function comment(moment_id) {
+    var text = window.prompt();
+
+    $.ajax({
+        method: "POST",
+        url: "/moment/"+moment_id,
+        data: {'text': text, 'uid': uid}
+    }).done(function(msg) {
+        location.reload();
+    });
+}

@@ -49,4 +49,4 @@ class MomentHandler(tornado.web.RequestHandler):
 					Moment.create(text,uid,self)
 
 				else:
-					Moment.reply(self)
+					Moment.reply(vid,text,uid,self)

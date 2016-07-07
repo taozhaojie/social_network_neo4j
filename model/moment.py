@@ -87,3 +87,21 @@ class Moment(object):
 		except:
 			pass
 		sf.write(json_encode({'ret':0, 'data':ret}))
+
+	@classmethod
+	def reply(self,vid,text,uid,sf):
+		uid = str(uid)
+		cql = '''
+				MATCH (me)
+				WHERE me.uid=%s
+				OPTIONAL MATCH (me)-[r:REPLY]-(secondlatestupdate)
+				DELETE r
+				CREATE (me)-[:REPLY]->(latest_update:Event {id:'%s', text:'%s', timestamp:%i})
+				WITH latest_update, collect(secondlatestupdate) AS seconds
+				FOREACH (x IN seconds | CREATE (latest_update)-[:NEXT]->(x))
+				WITH latest_update
+				MATCH (evt:Event {id: '%s'})
+				CREATE (latest_update)-[:REPLY_TO]->(evt)
+				RETURN latest_update.text AS new_status'''%(uid, uuid.uuid4(), text, function.timestamp(), vid)
+		res = db.cypher.execute(cql)
+		print '#', res
