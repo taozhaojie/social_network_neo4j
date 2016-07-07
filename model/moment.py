@@ -71,3 +71,19 @@ class Moment(object):
 				CREATE (latest_update)-[:LIKE_TO]->(evt)
 				RETURN latest_update.text AS new_status'''%(uid, function.timestamp(), vid)
 		res = db.cypher.execute(cql)
+
+	@classmethod
+	def liked(self,vid,sf):
+		vid = str(vid)
+		cql = '''
+				MATCH (evt:Event {id:'%s'})-[r:LIKE_TO]-(likes)-[:LIKE_FROM]-(users)
+				RETURN users'''%(vid)
+		res = db.cypher.execute(cql)
+
+		ret = []
+		try:
+			for r in res:
+				ret.append(r[0].properties)
+		except:
+			pass
+		sf.write(json_encode({'ret':0, 'data':ret}))

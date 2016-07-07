@@ -68,12 +68,33 @@ $.ajax({
             time_pass = Math.round(time_now - time).toString() + ' 秒前';
         }
 
-        var st = `  <div class="moment-box">
-                        <h1 onclick="view_user(`+uid+`)">`+name+`</h1><br>
-                        <p>`+text+`</p><br>
-                        <span>`+time_pass+`</span><span onclick="like('`+id+`')">赞</span><span onclick="comment(`+id+`)">评论</span>
-                    </div>`
-        $('#view').append(st);
+        // load liked users
+        $.ajax({
+            method: "GET",
+            url: "/moment/"+id+"?action=liked"
+        }).done(function(msg) {
+            var data = $.parseJSON(msg)['data'];
+            var temp = [];
+            $.each(data, function(k, v) {
+                var name_liked = v['name'];
+                temp.push(name_liked);
+            });
+            if (temp.length > 0) {
+                var st_liked = `<div class="like-box">❤ `+temp.join(', ')+`</div>`;
+            } else {
+                var st_liked = '';
+            }
+
+            var st = `  <div class="moment-box">
+                            <h1 onclick="view_user(`+uid+`)">`+name+`</h1><br>
+                            <p>`+text+`</p><br>
+                            <span>`+time_pass+`</span><span onclick="like('`+id+`')">赞</span><span onclick="comment(`+id+`)">评论</span>
+                            `+st_liked+`
+                        </div>`
+
+            $('#view').append(st);
+        });
+        
     });
 
 });
@@ -86,3 +107,4 @@ function like(moment_id) {
         location.reload();
     });
 }
+
