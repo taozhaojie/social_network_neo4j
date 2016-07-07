@@ -103,6 +103,7 @@ class Moment(object):
 				MATCH (evt:Event {id: '%s'})
 				CREATE (latest_update)-[:REPLY_TO]->(evt)
 				RETURN latest_update.text AS new_status'''%(uid, uuid.uuid4(), text, function.timestamp(), vid)
+		print cql
 		res = db.cypher.execute(cql)
 		print '#', res
 
@@ -113,7 +114,7 @@ class Moment(object):
 				MATCH (evt:Event {id:'%s'})-[r:REPLY_TO*0..]-(related_events)-[:NEXT*0..]-(other_replies)-[:REPLY|POST]-(replied_from)
 				WITH related_events, replied_from
 				MATCH (related_events)-[:REPLY_TO]->(replied_events)-[:NEXT*0..]-(other_replies)-[:REPLY|POST]-(replied_to)
-				RETURN  related_events.id, replied_events.id, related_events.text, replied_from.uid, replied_to.uid, replied_from.name, replied_to.name, replied_events.timestamp as time
+				RETURN  related_events.id, replied_events.id, related_events.text, replied_from.uid, replied_to.uid, replied_from.name, replied_to.name, related_events.timestamp as time
 				ORDER BY time'''%(vid)
 		res = db.cypher.execute(cql)
 
