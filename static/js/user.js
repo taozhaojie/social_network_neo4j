@@ -87,3 +87,29 @@ function friend_delete (init_user) {
         location.reload();
     });
 }
+
+$.ajax({
+    method: "GET",
+    url: "/user/"+uid+"?action=n"
+}).done(function(msg) {
+    var data = $.parseJSON(msg)['data'];
+    var temp = [];
+    var st_reply = '';
+    $.each(data, function(k, v) {
+        var event_type = v['event_type'];
+        var event_text = v['event_text'];
+        var target_text = v['target_text'];
+        var owner = v['owner'];
+        var user = v['user'];
+
+        var type;
+        if (event_type == 'LIKE') {
+            type = '赞了';
+        } else if (event_type == 'Event') {
+            type = '回复了';
+        }
+
+        st_reply += `<div class="comment-box"><h2>`+user+`</h2>`+type+`<h2>`+owner+`</h2></div>`;
+        $('#notif').append(st_reply);
+    });
+});

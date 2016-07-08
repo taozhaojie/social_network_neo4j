@@ -95,3 +95,29 @@ class User(object):
 		res = db.cypher.execute(cql)
 
 		sf.write(json_encode({'ret':0}))
+
+	@classmethod
+	def get_notification(self,vid,sf):
+		vid = str(vid)
+		cql = '''
+				MATCH (me)
+				WHERE me.uid=%s
+				MATCH (me)-[:SUBS_FROM]-(subs)-[:SUBS_TO]-(target)-[:NEXT*0..]-(posts)-[:POST]-(owner)
+				WITH subs, target, owner
+				MATCH (subs)-[:NOTIFICATION]-(event)-[:NEXT*0..]-(evt)-[:LIKE_FROM|REPLY]-(user)
+				RETURN labels(event), event.text, target.text, owner.name, user.name, event.timestamp as time
+				ORDER BY time DESC'''%(vid)
+		res = db.cypher.execute(cql)
+
+		ret = []
+		try:
+			for r in res:
+				ret.append({'event_type': r[0][0],
+							'event_text': r[1],
+							'target_text': r[2],
+							'owner': r[3],
+							'user': r[4],
+							'time': r[5]})
+		except:
+			pass
+		sf.write(json_encode({'ret':0, 'data':ret}))

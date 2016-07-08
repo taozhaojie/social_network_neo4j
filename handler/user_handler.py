@@ -26,7 +26,8 @@ class UserHandler(tornado.web.RequestHandler):
 				if not action:
 					self.render('user.html')
 				else:
-					pass
+					if action == 'n':
+						User.get_notification(vid, self)
 
 	# @tornado.web.asynchronous
 	def post(self, vid):

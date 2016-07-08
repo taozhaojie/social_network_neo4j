@@ -71,9 +71,25 @@ body {
     top: 50px;
     border: 1px solid #000000;
     padding: 10px;
+    overflow-y: scroll;
 }
 
 #friend-add-id {
     width: 100%;
     margin-bottom: 10px;
+}
+
+.comment-box {
+    background-color: #D1D1D1;
+    padding: 5px;
+    width: 100%;
+    word-wrap: break-word;
+    font-size: 12pt;
+    cursor: pointer;
+}
+
+.comment-box h2 {
+    color: #003D7A;
+    font-size: 12pt;
+    display: inline;
 }
