@@ -22,9 +22,18 @@ class Moment(object):
 				OPTIONAL MATCH (me)-[r:POST]-(secondlatestupdate)
 				DELETE r
 				CREATE (me)-[:POST]->(latest_update:Event {id:'%s', text:'%s', timestamp:%i})
-				WITH latest_update, collect(secondlatestupdate) AS seconds
+				WITH latest_update, collect(secondlatestupdate) AS seconds, me
 				FOREACH (x IN seconds | CREATE (latest_update)-[:NEXT]->(x))
-				RETURN latest_update.text AS new_status'''%(uid, uuid.uuid4(), text, function.timestamp())
+				WITH latest_update, me
+				OPTIONAL MATCH (me)-[r:SUBS_FROM]-(secondsubs)
+				DELETE r
+				CREATE (me)-[:SUBS_FROM]->(latest_subs:SUBSCRIBLE {timestamp:%i})
+				WITH latest_subs, latest_update, collect(secondsubs) as secs
+				CREATE (latest_subs)-[:SUBS_TO]->(latest_update)
+				WITH secs, latest_subs
+				FOREACH (x IN secs | CREATE (latest_subs)-[:NEXT]->(x))
+				'''%(uid, uuid.uuid4(), text, function.timestamp(), function.timestamp())
+		print cql
 		res = db.cypher.execute(cql)
 		print '#', res
 
