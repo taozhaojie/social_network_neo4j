@@ -78,10 +78,12 @@ class Moment(object):
 				WITH latest_update
 				MATCH (evt:Event {id: '%s'})
 				CREATE (latest_update)-[:LIKE_TO]->(evt)
-				RETURN evt.id AS uuid'''%(uid, function.timestamp(), vid)
+				RETURN evt.id AS uuid, ID(latest_update)'''%(uid, function.timestamp(), vid)
+		print cql
 		res = db.cypher.execute(cql)
 
 		temp_id = res[0][0]
+		node_id = int(res[0][1])
 
 		cql = '''
 				MATCH(me)
@@ -107,6 +109,20 @@ class Moment(object):
 					FOREACH (x IN seconds | CREATE (latest_update)-[:NEXT]->(x))'''%(uid, function.timestamp(), temp_id)
 			print cql
 			res = db.cypher.execute(cql)
+
+		cql = '''
+				MATCH (me)
+				WHERE me.uid=%s
+				MATCH (evt)
+				WHERE evt.id='%s'
+				MATCH (like)
+				WHERE ID(like) = %i
+				MATCH (me)-[:SUBS_FROM]-(sub)-[:SUBS_TO]-(evt)-[:SUBS_TO]-(subs)
+				WITH collect(subs) as subscribers, like
+				FOREACH (x IN subscribers | CREATE (like)-[:NOTIFICATION {read: 0}]->(x))
+		'''%(uid, temp_id, node_id)
+		print cql
+		res = db.cypher.execute(cql)
 
 	@classmethod
 	def liked(self,vid,sf):
