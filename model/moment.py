@@ -69,8 +69,35 @@ class Moment(object):
 				WITH latest_update
 				MATCH (evt:Event {id: '%s'})
 				CREATE (latest_update)-[:LIKE_TO]->(evt)
-				RETURN latest_update.text AS new_status'''%(uid, function.timestamp(), vid)
+				RETURN evt.id AS uuid'''%(uid, function.timestamp(), vid)
 		res = db.cypher.execute(cql)
+
+		temp_id = res[0][0]
+
+		cql = '''
+				MATCH(me)
+				WHERE me.uid=%s
+				MATCH (me)-[r:SUBS_FROM]-(subs)-[:SUBS_TO]-(evt:Event {id:'%s'})
+				RETURN COUNT(r)
+				'''%(uid, temp_id)
+		res = db.cypher.execute(cql)
+
+		if res[0][0] == 0:
+			cql = '''
+					MATCH(me)
+					WHERE me.uid=%s
+					OPTIONAL MATCH (me)-[r:SUBS_FROM]-(secondlatestupdate)
+					DELETE r
+					CREATE (me)-[:SUBS_FROM]->(latest_update:SUBSCRIBLE {timestamp:%i})
+					WITH latest_update, collect(secondlatestupdate) AS seconds
+					MATCH (evt)
+					WHERE evt.id='%s'
+					WITH latest_update, seconds, evt
+					CREATE (latest_update)-[:SUBS_TO]->(evt)
+					WITH latest_update, seconds
+					FOREACH (x IN seconds | CREATE (latest_update)-[:NEXT]->(x))'''%(uid, function.timestamp(), temp_id)
+			print cql
+			res = db.cypher.execute(cql)
 
 	@classmethod
 	def liked(self,vid,sf):
@@ -103,11 +130,9 @@ class Moment(object):
 				MATCH (evt:Event {id: '%s'})
 				CREATE (latest_update)-[:REPLY_TO]->(evt)
 				RETURN latest_update.id as uuid'''%(uid, uuid.uuid4(), text, function.timestamp(), vid)
-		print cql
 		res = db.cypher.execute(cql)
 
 		temp_id = res[0][0]
-		print temp_id
 
 		cql = '''
 				MATCH(me)
@@ -117,15 +142,16 @@ class Moment(object):
 				MATCH (me)-[r:SUBS_FROM]-(subs)-[:SUBS_TO]-(root_evt)
 				RETURN COUNT(r)
 				'''%(uid, temp_id)
-		print cql
 		res = db.cypher.execute(cql)
 
 		if res[0][0] == 0:
 			cql = '''
 					MATCH(me)
 					WHERE me.uid=%s
-					MATCH (evt:Event {id:'%s'})-[:REPLY_TO*]->(root_evt)
+					MATCH (evt:Event {id:'%s'})-[:REPLY_TO*]-(evts)-[:REPLY_TO]->(root_evt)
 					WITH root_evt, me
+					ORDER BY root_evt.timestamp
+					LIMIT 1
 					OPTIONAL MATCH (me)-[r:SUBS_FROM]-(secondlatestupdate)
 					DELETE r
 					CREATE (me)-[:SUBS_FROM]->(latest_update:SUBSCRIBLE {timestamp:%i})
@@ -133,7 +159,6 @@ class Moment(object):
 					CREATE (latest_update)-[:SUBS_TO]->(root_evt)
 					WITH latest_update, seconds
 					FOREACH (x IN seconds | CREATE (latest_update)-[:NEXT]->(x))'''%(uid, temp_id, function.timestamp())
-			print cql
 			res = db.cypher.execute(cql)
 
 	@classmethod

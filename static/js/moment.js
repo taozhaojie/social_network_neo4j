@@ -51,22 +51,26 @@ $.ajax({
 
         var time_now = Math.floor(Date.now() / 1000);
         var time_pass;
-        if ((time_now - time) >= 60) {
-            if ((time_now - time) / 60 >= 60) {
-                if ((time_now - time) / 60 / 60 >= 24) {
-                    time_pass = Math.round((time_now - time) / 60 / 60 / 24).toString() + ' 天前';
+        if ((time_now - time) <= 0) {
+            time_pass = '0 秒前';
+        } else {
+            if ((time_now - time) >= 60) {
+                if ((time_now - time) / 60 >= 60) {
+                    if ((time_now - time) / 60 / 60 >= 24) {
+                        time_pass = Math.round((time_now - time) / 60 / 60 / 24).toString() + ' 天前';
+                    } else {
+                        time_pass = Math.round((time_now - time) / 60 / 60).toString() + ' 小时前';
+                    }
+
                 } else {
-                    time_pass = Math.round((time_now - time) / 60 / 60).toString() + ' 小时前';
+                    time_pass = Math.round((time_now - time) / 60).toString() + ' 分钟前';
                 }
 
             } else {
-                time_pass = Math.round((time_now - time) / 60).toString() + ' 分钟前';
+                time_pass = Math.round(time_now - time).toString() + ' 秒前';
             }
-
-        } else {
-            time_pass = Math.round(time_now - time).toString() + ' 秒前';
         }
-
+        
         // load liked users
         $.ajax({
             method: "GET",
