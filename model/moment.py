@@ -154,16 +154,19 @@ class Moment(object):
 				WITH latest_update
 				MATCH (evt:Event {id: '%s'})
 				CREATE (latest_update)-[:REPLY_TO]->(evt)
-				RETURN latest_update.id as uuid'''%(uid, uuid.uuid4(), text, function.timestamp(), vid)
+				RETURN latest_update.id as uuid, ID(latest_update)'''%(uid, uuid.uuid4(), text, function.timestamp(), vid)
 		res = db.cypher.execute(cql)
 
 		temp_id = res[0][0]
+		node_id = int(res[0][1])
 
 		cql = '''
 				MATCH(me)
 				WHERE me.uid=%s
-				MATCH (evt:Event {id:'%s'})-[:REPLY_TO*]->(root_evt)
+				MATCH (evt:Event {id:'%s'})-[:REPLY_TO*0..]-(evts)-[:REPLY_TO]->(root_evt)
 				WITH root_evt, me
+				ORDER BY root_evt.timestamp
+				LIMIT 1
 				MATCH (me)-[r:SUBS_FROM]-(subs)-[:SUBS_TO]-(root_evt)
 				RETURN COUNT(r)
 				'''%(uid, temp_id)
@@ -173,7 +176,7 @@ class Moment(object):
 			cql = '''
 					MATCH(me)
 					WHERE me.uid=%s
-					MATCH (evt:Event {id:'%s'})-[:REPLY_TO*]-(evts)-[:REPLY_TO]->(root_evt)
+					MATCH (evt:Event {id:'%s'})-[:REPLY_TO*0..]-(evts)-[:REPLY_TO]->(root_evt)
 					WITH root_evt, me
 					ORDER BY root_evt.timestamp
 					LIMIT 1
@@ -185,6 +188,22 @@ class Moment(object):
 					WITH latest_update, seconds
 					FOREACH (x IN seconds | CREATE (latest_update)-[:NEXT]->(x))'''%(uid, temp_id, function.timestamp())
 			res = db.cypher.execute(cql)
+
+		cql = '''
+				MATCH (me)
+				WHERE me.uid=%s
+				MATCH (evt:Event {id:'%s'})-[:REPLY_TO*0..]-(evts)-[:REPLY_TO]->(root_evt)
+				WITH root_evt, me
+				ORDER BY root_evt.timestamp
+				LIMIT 1
+				MATCH (reply)
+				WHERE ID(reply) = %i
+				MATCH (me)-[:SUBS_FROM]->(sub1)-[:NEXT*0..]->(sub2)-[:SUBS_TO]-(root_evt)-[:SUBS_TO]-(subs)
+				WITH collect(subs) as subscribers, reply
+				FOREACH (x IN subscribers | CREATE (reply)-[:NOTIFICATION {read: 0}]->(x))
+		'''%(uid, temp_id, node_id)
+		print cql
+		res = db.cypher.execute(cql)
 
 	@classmethod
 	def reply_get(self,vid,sf):
